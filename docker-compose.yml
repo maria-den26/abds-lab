@@ -1,0 +1,4 @@
+include:
+  - path: ./compose.services.yml
+    project_directory: .
+    env_file: ./.env.local
