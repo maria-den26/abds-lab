@@ -77,12 +77,26 @@ public final class Input {
      * @throws ApiException если дата недопустима
      */
     public static LocalDate date(String value, String field, boolean parameter) {
+        LocalDate date = calendarDate(value, field, parameter);
+        if (date.isBefore(LocalDate.of(1970, 1, 1)) || date.isAfter(LocalDate.of(2106, 2, 6)))
+            throw parameter ? ApiException.invalidParameter(field) : ApiException.invalidField(field);
+        return date;
+    }
+
+    /**
+     * Разбирает календарную дату независимо от диапазона хранения ClickHouse.
+     * Поиск по корректной дате вне истории данных должен отличаться от ошибки формата запроса.
+     *
+     * @param value дата в формате {@code YYYY-MM-DD}
+     * @param field имя поля или параметра для сообщения об ошибке
+     * @param parameter признак параметра URL вместо поля JSON
+     * @return существующая календарная дата
+     * @throws ApiException если дата отсутствует, имеет неверный формат или не существует
+     */
+    public static LocalDate calendarDate(String value, String field, boolean parameter) {
         try {
             if (value == null || !value.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")) throw new DateTimeParseException("date", "", 0);
-            LocalDate date = LocalDate.parse(value);
-            if (date.isBefore(LocalDate.of(1970, 1, 1)) || date.isAfter(LocalDate.of(2106, 2, 6)))
-                throw new DateTimeParseException("range", value, 0);
-            return date;
+            return LocalDate.parse(value);
         } catch (DateTimeParseException e) {
             throw parameter ? ApiException.invalidParameter(field) : ApiException.invalidField(field);
         }

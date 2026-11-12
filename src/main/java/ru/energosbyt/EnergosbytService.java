@@ -161,12 +161,15 @@ public class EnergosbytService {
     /**
      * Выбирает тариф по условию {@code valid_from <= date && date < valid_to}. При нескольких подходящих
      * тарифах возвращает первый по id.
+     * Корректная дата вне диапазона DateTime означает отсутствие тарифа, а не ошибку запроса.
      *
      * @param date дата поиска
      * @return версия тарифа, действующая на дату
      */
     public JsonNode tariff(String date) {
-        LocalDate day = Input.date(date, "date", true);
+        LocalDate day = Input.calendarDate(date, "date", true);
+        long timestamp = day.atStartOfDay().toEpochSecond(java.time.ZoneOffset.UTC);
+        if (timestamp < 0 || timestamp > 4294967295L) throw ApiException.notFound();
         return one("SELECT id,name,price_day_kwph,price_night_kwph,valid_from,valid_to FROM dim_tariffs FINAL "
                 + "WHERE valid_from <= toDateTime({date:Date}) AND toDateTime({date:Date}) < valid_to "
                 + "ORDER BY id,valid_from DESC LIMIT 1", Map.of("date", day));

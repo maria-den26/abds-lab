@@ -211,7 +211,9 @@ SELECT count() FROM dim_realty WHERE id=90000; -- 0
 
 ## Запуск
 
-Необходимы Docker Engine или Docker Desktop с Docker Compose v2 и GNU Make. Java и Maven на хосте устанавливать не нужно: приложение и команды работы с данными запускаются в контейнерах. В Windows команды Makefile выполняются из Linux/WSL с доступом к Docker Desktop.
+Необходимы Docker Engine или Docker Desktop с Docker Compose 2.20 или новее и GNU Make. Java и Maven на хосте устанавливать не нужно: приложение и команды работы с данными запускаются в контейнерах. В Windows команды Makefile выполняются из Linux/WSL с доступом к Docker Desktop.
+
+`docker-compose.yml` подключает определения сервисов из `compose.services.yml` через `include` и загружает `.env.local` для подстановки переменных. Поэтому команды `docker compose logs` и `docker compose down` работают без дополнительного `--env-file`; настройки по-прежнему хранятся только в `.env.local`.
 
 Запускайте команды в корне проекта:
 
@@ -280,8 +282,10 @@ src/test/java/ru/energosbyt/
   DataGeneratorTest.java             # Тесты генератора и расчёта счетов
   InputTest.java                     # Тесты валидации
   LiveScdTest.java                   # Интеграционные тесты API и SCD
+  TariffTest.java                    # Ошибки дат и отсутствие версии тарифа
 Dockerfile                           # Сборка Java-приложения в образ
-docker-compose.yml                   # Запуск приложения и ClickHouse
+docker-compose.yml                   # Подключение сервисов и файла настроек
+compose.services.yml                 # Приложение и ClickHouse
 Makefile                             # Команды управления проектом
 pom.xml                              # Зависимости и настройки сборки Maven
 ```

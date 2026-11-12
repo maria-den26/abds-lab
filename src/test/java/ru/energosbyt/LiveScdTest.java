@@ -110,6 +110,8 @@ class LiveScdTest {
             assertEquals(620, call("GET", "/tariffs?date=2026-10-31", null, 200).get("price_day_kwph").asInt());
             assertEquals(700, call("GET", "/tariffs?date=2026-11-01", null, 200).get("price_day_kwph").asInt());
             call("GET", "/tariffs?date=2023-10-31", null, 404);
+            call("GET", "/tariffs?date=1900-01-01", null, 404);
+            call("GET", "/tariffs?date=2107-01-01", null, 404);
             for (String path : new String[]{"/users/999999", "/realty/999999", "/realty/999999/invoices", "/realty/999999/readings?date_from=2026-10-01&date_to=2026-10-02"})
                 assertEquals("Not found", call("GET", path, null, 404).get("message").asText());
             call("POST", "/realty/" + id + "/gauges", "{\"gauge_id\":999999}", 404);
