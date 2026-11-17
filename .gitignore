@@ -98,3 +98,8 @@ yarn-error.log*
 vendor/
 composer.phar
 composer.lock
+
+data/
+volume/
+.runtime/
+.work/
